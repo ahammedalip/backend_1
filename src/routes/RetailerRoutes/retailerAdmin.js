@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const retailerAdmin_1 = require("../../controllers/RetailerController/retailerAdmin");
+const verifyUser_1 = require("../../utils/verifyUser");
+const router = express_1.default.Router();
+router.post('/add_sales', verifyUser_1.verifyRetailer, retailerAdmin_1.addSalesExecutive);
+router.get('/sales_list', retailerAdmin_1.getSalesList);
+router.put('/toggle_block_update', verifyUser_1.verifyRetailer, retailerAdmin_1.blockSalesExec);
+router.get('/available', verifyUser_1.verifyRetailer, retailerAdmin_1.avialableProd);
+router.get('/profile', verifyUser_1.verifyRetailer, retailerAdmin_1.profile);
+router.get('/prod/profile', verifyUser_1.verifyRetailer, retailerAdmin_1.showProductionprofile);
+router.post('/conn-req', verifyUser_1.verifyRetailer, retailerAdmin_1.sendConnectionRequest);
+router.get('/connected', verifyUser_1.verifyRetailer, retailerAdmin_1.connectedProd);
+router.get('/getOrder', verifyUser_1.verifyRetailer, retailerAdmin_1.getOrder);
+router.patch('/subscription', verifyUser_1.verifyRetailer, retailerAdmin_1.addSubscription);
+router.get('/reports', verifyUser_1.verifyRetailer, retailerAdmin_1.getReport);
+exports.default = router;
