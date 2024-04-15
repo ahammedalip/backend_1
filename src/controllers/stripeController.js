@@ -26,8 +26,8 @@ const createCheckout = (req, res) => __awaiter(void 0, void 0, void 0, function*
         ],
         currency: "usd",
         mode: 'subscription',
-        success_url: `http://localhost:5173/success?time=six`,
-        cancel_url: `http://localhost:5173/failed`,
+        success_url: `https://scaleb.vercel.app/success?time=six`,
+        cancel_url: `https://scaleb.vercel.app/failed`,
     });
     // Return the session ID to the client
     res.json({ id: session.id });
