@@ -18,4 +18,5 @@ router.get('/connected', verifyUser_1.verifyRetailer, retailerAdmin_1.connectedP
 router.get('/getOrder', verifyUser_1.verifyRetailer, retailerAdmin_1.getOrder);
 router.patch('/subscription', verifyUser_1.verifyRetailer, retailerAdmin_1.addSubscription);
 router.get('/reports', verifyUser_1.verifyRetailer, retailerAdmin_1.getReport);
+router.get('/fetch-plans', verifyUser_1.verifyRetailer, retailerAdmin_1.fetchRetailPlans);
 exports.default = router;

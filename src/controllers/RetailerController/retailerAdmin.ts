@@ -10,6 +10,7 @@ import cron from 'node-cron'
 import payment from "../../models/Payments";
 import { CustomRequest } from "../../interfaces/interfaces";
 import { retailerAdmin } from "../../models/RetailerAdmin";
+import { subscriptionPlans } from "../../models/SubscriptionPlans";
 
 
 // Schedule a job to run every day at 12 pm
@@ -304,21 +305,23 @@ export const getOrder = async (req: Request, res: Response) => {
     }
 };
 
-
 export const addSubscription = async (req: Request, res: Response) => {
-    console.log('retailer');
-    const { time, id } = req.query
-    const currentDate = new Date();
-    let endDate = new Date(currentDate);
-    let duration
-    if (time === 'six') {
-        duration = 'six'
-        endDate.setDate(currentDate.getDate() + 180); // 180 days from now
-    } else if (time === 'one') {
-        duration = 'one'
-        endDate.setDate(currentDate.getDate() + 365); // 365 days from now
-    }
+    const { planId, id } = req.query
+   
     try {
+        const fetchplan = await subscriptionPlans.findById(planId)
+        const timeDuration = fetchplan?.duration
+        const currentDate = new Date();
+        let endDate = new Date(currentDate);
+        let duration = ''
+        if(timeDuration == '6'){
+            duration = 'six'
+        endDate.setDate(currentDate.getDate() + 180); // 180 days from now
+        }else if(timeDuration == '3'){
+            duration = 'three'
+            endDate.setDate(currentDate.getDate() + 90);
+        }
+
         const subscription = await retailerAdmin.findByIdAndUpdate(
             id,
             {
@@ -326,24 +329,18 @@ export const addSubscription = async (req: Request, res: Response) => {
                     subscribed: {
                         endDate: endDate,
                         active: true,
-                        duration: time
+                        duration,
                     }
                 }
             }, { new: true }
 
         )
-        let paidAmount
-        if (time == 'six') {
-            paidAmount = 249
-
-        } else if (time == 'one') {
-            paidAmount = 399
-        }
+       
         const newPayment = new payment({
             userId: id,
-            amount: paidAmount,
+            amount: fetchplan?.amount,
             role: 'RetailerAdmin',
-            period: time
+            period: duration
 
         })
         await newPayment.save()
@@ -352,7 +349,6 @@ export const addSubscription = async (req: Request, res: Response) => {
         console.log('error while updating subscription', error)
         res.status(500)
     }
-
 }
 
 export const getReport = async (req: Request, res: Response) => {
@@ -407,3 +403,13 @@ export const getReport = async (req: Request, res: Response) => {
 }
 
 
+export const fetchRetailPlans = async(req:Request, res:Response) =>{
+    try {
+        const fetch = await subscriptionPlans.find({role:'retailer', active: true})
+        console.log(fetch);
+        res.status(200).json({success:true, fetch})
+    } catch (error) {
+        console.log('error while fetching subscription plans');
+        res.status(500)
+    }
+}

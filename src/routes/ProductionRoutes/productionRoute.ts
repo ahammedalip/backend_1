@@ -7,6 +7,7 @@ import {
     sortRetailer
 } from '../../controllers/ProductionController/ProductionController';
 import { acceptOrder, countOrder, fetchOrdersAll, rejectOrder } from '../../controllers/ProductionController/fetchOrder';
+import { fetchPlans } from '../../controllers/SuperAdmin/superAdmin';
 
 
 
@@ -33,5 +34,6 @@ router.patch('/subscription', verifyProduction, addSubscription)
 router.get('/search-user', verifyProduction, searchRetailer)
 router.get('/retailer-sort', verifyProduction, sortRetailer)
 router.get('/report', verifyProduction,getReports)
+router.get('/fetch-plans', verifyProduction,fetchPlans)
 
 export default router;

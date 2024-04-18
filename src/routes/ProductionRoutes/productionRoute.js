@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const verifyUser_1 = require("../../utils/verifyUser");
 const ProductionController_1 = require("../../controllers/ProductionController/ProductionController");
 const fetchOrder_1 = require("../../controllers/ProductionController/fetchOrder");
+const superAdmin_1 = require("../../controllers/SuperAdmin/superAdmin");
 const router = express_1.default.Router();
 router.get('/profile', verifyUser_1.verifyProduction, ProductionController_1.getProfile);
 router.post('/addItem', verifyUser_1.verifyProduction, ProductionController_1.addItem);
@@ -27,4 +28,5 @@ router.patch('/subscription', verifyUser_1.verifyProduction, ProductionControlle
 router.get('/search-user', verifyUser_1.verifyProduction, ProductionController_1.searchRetailer);
 router.get('/retailer-sort', verifyUser_1.verifyProduction, ProductionController_1.sortRetailer);
 router.get('/report', verifyUser_1.verifyProduction, ProductionController_1.getReports);
+router.get('/fetch-plans', verifyUser_1.verifyProduction, superAdmin_1.fetchPlans);
 exports.default = router;

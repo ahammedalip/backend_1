@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReport = exports.addSubscription = exports.getOrder = exports.sendConnectionRequest = exports.showProductionprofile = exports.avialableProd = exports.connectedProd = exports.profile = exports.blockSalesExec = exports.getSalesList = exports.addSalesExecutive = void 0;
+exports.fetchRetailPlans = exports.getReport = exports.addSubscription = exports.getOrder = exports.sendConnectionRequest = exports.showProductionprofile = exports.avialableProd = exports.connectedProd = exports.profile = exports.blockSalesExec = exports.getSalesList = exports.addSalesExecutive = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
@@ -23,6 +23,7 @@ const Reviews_1 = __importDefault(require("../../models/Reviews"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const Payments_1 = __importDefault(require("../../models/Payments"));
 const RetailerAdmin_1 = require("../../models/RetailerAdmin");
+const SubscriptionPlans_1 = require("../../models/SubscriptionPlans");
 // Schedule a job to run every day at 12 pm
 node_cron_1.default.schedule('0 12 * * *', () => __awaiter(void 0, void 0, void 0, function* () {
     const currentDate = new Date();
@@ -272,41 +273,35 @@ const getOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getOrder = getOrder;
 const addSubscription = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('retailer');
-    const { time, id } = req.query;
-    const currentDate = new Date();
-    let endDate = new Date(currentDate);
-    let duration;
-    if (time === 'six') {
-        duration = 'six';
-        endDate.setDate(currentDate.getDate() + 180); // 180 days from now
-    }
-    else if (time === 'one') {
-        duration = 'one';
-        endDate.setDate(currentDate.getDate() + 365); // 365 days from now
-    }
+    const { planId, id } = req.query;
     try {
+        const fetchplan = yield SubscriptionPlans_1.subscriptionPlans.findById(planId);
+        const timeDuration = fetchplan === null || fetchplan === void 0 ? void 0 : fetchplan.duration;
+        const currentDate = new Date();
+        let endDate = new Date(currentDate);
+        let duration = '';
+        if (timeDuration == '6') {
+            duration = 'six';
+            endDate.setDate(currentDate.getDate() + 180); // 180 days from now
+        }
+        else if (timeDuration == '3') {
+            duration = 'three';
+            endDate.setDate(currentDate.getDate() + 90);
+        }
         const subscription = yield RetailerAdmin_1.retailerAdmin.findByIdAndUpdate(id, {
             $set: {
                 subscribed: {
                     endDate: endDate,
                     active: true,
-                    duration: time
+                    duration,
                 }
             }
         }, { new: true });
-        let paidAmount;
-        if (time == 'six') {
-            paidAmount = 249;
-        }
-        else if (time == 'one') {
-            paidAmount = 399;
-        }
         const newPayment = new Payments_1.default({
             userId: id,
-            amount: paidAmount,
+            amount: fetchplan === null || fetchplan === void 0 ? void 0 : fetchplan.amount,
             role: 'RetailerAdmin',
-            period: time
+            period: duration
         });
         yield newPayment.save();
         res.status(200).json({ success: true, subscription });
@@ -365,3 +360,15 @@ const getReport = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getReport = getReport;
+const fetchRetailPlans = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const fetch = yield SubscriptionPlans_1.subscriptionPlans.find({ role: 'retailer', active: true });
+        console.log(fetch);
+        res.status(200).json({ success: true, fetch });
+    }
+    catch (error) {
+        console.log('error while fetching subscription plans');
+        res.status(500);
+    }
+});
+exports.fetchRetailPlans = fetchRetailPlans;

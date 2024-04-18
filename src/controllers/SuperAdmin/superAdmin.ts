@@ -5,6 +5,7 @@ import productionAdmin from "../../models/ProductionAdmin";
 import payment from "../../models/Payments";
 import { superAdmin } from '../../models/SuperAdmin';
 import { retailerAdmin } from '../../models/RetailerAdmin';
+import { subscriptionPlans } from '../../models/SubscriptionPlans';
 
 interface SuperAdmin {
     username: string;
@@ -242,6 +243,60 @@ export const getReport = async (req: Request, res: Response) => {
         res.status(200).json({success:true, revenueData})
     } catch (error) {
         console.log('error while getting report >>', error)
+        res.status(500)
+    }
+}
+
+
+
+export const createPlan = async (req: Request, res: Response) => {
+    const { role, name, features, amount, duration } = req.body
+    try {
+        const plan = new subscriptionPlans({
+            role,
+            name,
+            features,
+            duration,
+            amount
+
+        })
+        await plan.save()
+        res.status(200).json({ success: true })
+    } catch (error) {
+        console.log('error while creating new plan')
+        res.status(500)
+    }
+
+}
+
+export const fetchPlans = async (req: Request, res: Response) => {
+    try {
+        const plans = await subscriptionPlans.find()
+        console.log('plans-----', plans);
+        res.status(200).json({ success: true, plans })
+    } catch (error) {
+        console.log('error while fetching plans')
+        res.status(500)
+    }
+}
+
+export const handleActivation = async (req: Request, res: Response) => {
+    console.log(req.body);
+    console.log(req.body.active, req.body.planId)
+    try {
+        const updatedPlan = await subscriptionPlans.findOneAndUpdate(
+            { _id: req.body.planId }, 
+            { active: req.body.active }, 
+            { new: true } 
+        );
+
+        if (!updatedPlan) {
+            return res.status(404).json({ success: false, message: 'Plan not found' });
+        }
+
+        return res.status(200).json({ success: true, updatedPlan });
+    } catch (error) {
+        console.log('error while handling activation', error)
         res.status(500)
     }
 }

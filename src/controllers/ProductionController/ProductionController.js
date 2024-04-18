@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReports = exports.addSubscription = exports.sendConnectionRequest = exports.getRetailerProfile = exports.sortRetailer = exports.searchRetailer = exports.getAvailRetailList = exports.getConnRetailersList = exports.getSalesProfile = exports.availableSales = exports.rejectReq = exports.acceptReq = exports.fetchRequestedRetailers = exports.addItem = exports.getProfile = void 0;
+exports.fetchPlans = exports.getReports = exports.addSubscription = exports.sendConnectionRequest = exports.getRetailerProfile = exports.sortRetailer = exports.searchRetailer = exports.getAvailRetailList = exports.getConnRetailersList = exports.getSalesProfile = exports.availableSales = exports.rejectReq = exports.acceptReq = exports.fetchRequestedRetailers = exports.addItem = exports.getProfile = void 0;
 const ProductionAdmin_1 = __importDefault(require("../../models/ProductionAdmin"));
 const Order_1 = __importDefault(require("../../models/Order"));
 const RetailerSales_1 = __importDefault(require("../../models/RetailerSales"));
@@ -21,6 +21,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const Payments_1 = __importDefault(require("../../models/Payments"));
 const RetailerAdmin_1 = require("../../models/RetailerAdmin");
+const SubscriptionPlans_1 = require("../../models/SubscriptionPlans");
 // Schedule a job to run every day at 12 pm
 node_cron_1.default.schedule('0 12 * * *', () => __awaiter(void 0, void 0, void 0, function* () {
     const currentDate = new Date();
@@ -390,40 +391,35 @@ const sendConnectionRequest = (req, res) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.sendConnectionRequest = sendConnectionRequest;
 const addSubscription = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { time, id } = req.query;
-    const currentDate = new Date();
-    let endDate = new Date(currentDate);
-    let duration = '';
-    if (time === 'six') {
-        duration = 'six';
-        endDate.setDate(currentDate.getDate() + 180); // 180 days from now
-    }
-    else if (time === 'one') {
-        duration = 'one';
-        endDate.setDate(currentDate.getDate() + 365); // 365 days from now
-    }
+    const { planId, id } = req.query;
     try {
+        const fetchplan = yield SubscriptionPlans_1.subscriptionPlans.findById(planId);
+        const timeDuration = fetchplan === null || fetchplan === void 0 ? void 0 : fetchplan.duration;
+        const currentDate = new Date();
+        let endDate = new Date(currentDate);
+        let duration = '';
+        if (timeDuration == '6') {
+            duration = 'six';
+            endDate.setDate(currentDate.getDate() + 180); // 180 days from now
+        }
+        else if (timeDuration == '3') {
+            duration = 'three';
+            endDate.setDate(currentDate.getDate() + 90);
+        }
         const subscription = yield ProductionAdmin_1.default.findByIdAndUpdate(id, {
             $set: {
                 subscribed: {
                     endDate: endDate,
                     active: true,
-                    duration: time
+                    duration
                 }
             }
         }, { new: true });
-        let paidAmount;
-        if (time == 'six') {
-            paidAmount = 249;
-        }
-        else if (time == 'one') {
-            paidAmount = 399;
-        }
         const newPayment = new Payments_1.default({
             userId: id,
-            amount: paidAmount,
+            amount: fetchplan === null || fetchplan === void 0 ? void 0 : fetchplan.amount,
             role: 'ProductionAdmin',
-            period: time
+            period: duration
         });
         yield newPayment.save();
         res.status(200).json({ success: true, subscription });
@@ -463,3 +459,15 @@ const getReports = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.getReports = getReports;
+const fetchPlans = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const fetch = yield SubscriptionPlans_1.subscriptionPlans.find({ role: 'production', active: true });
+        console.log(fetch);
+        res.status(200).json({ success: true, fetch });
+    }
+    catch (error) {
+        console.log('error while fetching subscription plans');
+        res.status(500);
+    }
+});
+exports.fetchPlans = fetchPlans;

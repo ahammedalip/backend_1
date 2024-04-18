@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReport = exports.miniReport = exports.getRevenue = exports.blockUser = exports.getProductionList = exports.getRetailerList = exports.login = void 0;
+exports.handleActivation = exports.fetchPlans = exports.createPlan = exports.getReport = exports.miniReport = exports.getRevenue = exports.blockUser = exports.getProductionList = exports.getRetailerList = exports.login = void 0;
 const errorhandler_1 = require("../../utils/errorhandler");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const ProductionAdmin_1 = __importDefault(require("../../models/ProductionAdmin"));
 const Payments_1 = __importDefault(require("../../models/Payments"));
 const SuperAdmin_1 = require("../../models/SuperAdmin");
 const RetailerAdmin_1 = require("../../models/RetailerAdmin");
+const SubscriptionPlans_1 = require("../../models/SubscriptionPlans");
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password: reqPassword } = req.body;
     try {
@@ -228,3 +229,50 @@ const getReport = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getReport = getReport;
+const createPlan = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { role, name, features, amount, duration } = req.body;
+    try {
+        const plan = new SubscriptionPlans_1.subscriptionPlans({
+            role,
+            name,
+            features,
+            duration,
+            amount
+        });
+        yield plan.save();
+        res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.log('error while creating new plan');
+        res.status(500);
+    }
+});
+exports.createPlan = createPlan;
+const fetchPlans = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const plans = yield SubscriptionPlans_1.subscriptionPlans.find();
+        console.log('plans-----', plans);
+        res.status(200).json({ success: true, plans });
+    }
+    catch (error) {
+        console.log('error while fetching plans');
+        res.status(500);
+    }
+});
+exports.fetchPlans = fetchPlans;
+const handleActivation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body);
+    console.log(req.body.active, req.body.planId);
+    try {
+        const updatedPlan = yield SubscriptionPlans_1.subscriptionPlans.findOneAndUpdate({ _id: req.body.planId }, { active: req.body.active }, { new: true });
+        if (!updatedPlan) {
+            return res.status(404).json({ success: false, message: 'Plan not found' });
+        }
+        return res.status(200).json({ success: true, updatedPlan });
+    }
+    catch (error) {
+        console.log('error while handling activation', error);
+        res.status(500);
+    }
+});
+exports.handleActivation = handleActivation;

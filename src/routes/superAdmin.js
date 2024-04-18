@@ -14,4 +14,7 @@ router.put('/toggle_block_update', verifyUser_1.verifyAdmin, superAdmin_1.blockU
 router.get('/mini-report', verifyUser_1.verifyAdmin, superAdmin_1.miniReport);
 router.get('/revenue', verifyUser_1.verifyAdmin, superAdmin_1.getRevenue);
 router.get('/report', verifyUser_1.verifyAdmin, superAdmin_1.getReport);
+router.post('/create-plan', verifyUser_1.verifyAdmin, superAdmin_1.createPlan);
+router.get('/fetch-plan', verifyUser_1.verifyAdmin, superAdmin_1.fetchPlans);
+router.post('/update-plan-status', verifyUser_1.verifyAdmin, superAdmin_1.handleActivation);
 exports.default = router;
