@@ -96,6 +96,7 @@ export const getSalesList = async (req: CustomRequest, res: Response) => {
 
     const id = req.id;
     const pageSize: number = 10
+    
     try {
         const { page = 1 } = req.query as { page?: number }
         const countSales = await retailerSales.countDocuments({ retailerAdminId: id })

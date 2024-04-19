@@ -89,22 +89,10 @@ const addSalesExecutive = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.addSalesExecutive = addSalesExecutive;
 const getSalesList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // const id = req.query.id;
-    // try {
-    //     const validAdmin = await retailerAdmin.findById(id)
-    //     if (!validAdmin) {
-    //         return res.status(403).json({ success: false, message: "Please login" })
-    //     }
-    //     const salesExeclist = await retailerSales.find({ retailerAdminId: id })
-    //     res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist })
-    const id = req.query.id;
+    const id = req.id;
     const pageSize = 10;
     try {
         const { page = 1 } = req.query;
-        const validAdmin = yield RetailerAdmin_1.retailerAdmin.findById(id);
-        if (!validAdmin) {
-            return res.status(403).json({ success: false, message: "Please login" });
-        }
         const countSales = yield RetailerSales_1.default.countDocuments({ retailerAdminId: id });
         const totalPages = Math.ceil(countSales / pageSize);
         const salesExeclist = yield RetailerSales_1.default.find({ retailerAdminId: id })
@@ -118,6 +106,7 @@ const getSalesList = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getSalesList = getSalesList;
 const blockSalesExec = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const adminId = req.id;
     const id = req.query.id;
     console.log('id from query is ', id);
     try {
@@ -133,7 +122,7 @@ const blockSalesExec = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (updateStatus) {
             console.log('updated', updateStatus);
         }
-        const salesExeclist = yield RetailerSales_1.default.find();
+        const salesExeclist = yield RetailerSales_1.default.find({ retailerAdminId: adminId });
         return res.status(200).json({ success: true, message: 'User blocked/unblocked successfully', userlist: salesExeclist });
     }
     catch (error) {
