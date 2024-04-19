@@ -8,7 +8,7 @@ const router = express.Router()
 
 
 router.post('/add_sales', verifyRetailer,addSalesExecutive)
-router.get('/sales_list',getSalesList)
+router.get('/sales_list',verifyRetailer,getSalesList)
 router.put('/toggle_block_update', verifyRetailer,blockSalesExec)
 router.get('/available', verifyRetailer,avialableProd)
 router.get('/profile', verifyRetailer, profile)

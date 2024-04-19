@@ -8,7 +8,7 @@ const retailerAdmin_1 = require("../../controllers/RetailerController/retailerAd
 const verifyUser_1 = require("../../utils/verifyUser");
 const router = express_1.default.Router();
 router.post('/add_sales', verifyUser_1.verifyRetailer, retailerAdmin_1.addSalesExecutive);
-router.get('/sales_list', retailerAdmin_1.getSalesList);
+router.get('/sales_list', verifyUser_1.verifyRetailer, retailerAdmin_1.getSalesList);
 router.put('/toggle_block_update', verifyUser_1.verifyRetailer, retailerAdmin_1.blockSalesExec);
 router.get('/available', verifyUser_1.verifyRetailer, retailerAdmin_1.avialableProd);
 router.get('/profile', verifyUser_1.verifyRetailer, retailerAdmin_1.profile);

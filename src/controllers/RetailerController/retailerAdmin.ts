@@ -93,20 +93,28 @@ export const addSalesExecutive = async (req: Request, res: Response) => {
 
 
 export const getSalesList = async (req: Request, res: Response) => {
+    // const id = req.query.id;
+    // try {
+    //     const validAdmin = await retailerAdmin.findById(id)
+    //     if (!validAdmin) {
+    //         return res.status(403).json({ success: false, message: "Please login" })
+    //     }
+    //     const salesExeclist = await retailerSales.find({ retailerAdminId: id })
+    //     res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist })
     const id = req.query.id;
-
+    const pageSize: number = 10
     try {
+        const { page = 1 } = req.query as { page?: number }
         const validAdmin = await retailerAdmin.findById(id)
         if (!validAdmin) {
             return res.status(403).json({ success: false, message: "Please login" })
         }
+        const countSales = await retailerSales.countDocuments({retailerAdminId:id})
+        const totalPages = Math.ceil(countSales / pageSize)
+
         const salesExeclist = await retailerSales.find({ retailerAdminId: id })
-
-
-
-
-        res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist })
-
+        .skip((page-1)*pageSize).limit(Number(pageSize))
+        res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist, pageSize, totalPages })
     } catch (error) {
         console.log('error at sales exec list', error);
         res.status(500).json({ success: false, message: "Error while fetching data" })
@@ -237,8 +245,6 @@ export const showProductionprofile = async (req: Request, res: Response) => {
         if (averageRating.length > 0) {
             averageToFive = Math.ceil((averageRating[0].averageRating / 2) * 2) / 2;
         }
-
-
         return res.status(200).json({ success: true, message: 'user details fetched successfully', userDetails: isvalidUser, rating: averageToFive })
     } catch (error) {
         console.log('error at showproductionprofile', error);
@@ -291,19 +297,42 @@ export const sendConnectionRequest = async (req: CustomRequest, res: Response) =
 };
 
 
-export const getOrder = async (req: Request, res: Response) => {
-    const retailerId = req.query.id;
+// export const getOrder = async (req: Request, res: Response) => {
+//     const retailerId = req.query.id;
+//     try {
+//         const countOrder = await order.countDocuments({ retailerId })
+
+//         const orders = await order.find({ retailerId }).populate('salesExecId').populate('productionId')
+
+//         res.status(200).json({ success: true, orders, countOrder });
+//     } catch (error) {
+//         console.error('Error fetching orders:', error);
+//         res.status(500).json({ success: false, message: 'Internal server error' });
+//     }
+// };
+
+export const getOrder = async (req: CustomRequest, res: Response) => {
+    const retailerId = req.id
+    const pageSize: number = 6;
     try {
+        const { page = 1 } = req.query as { page?: number }
+
         const countOrder = await order.countDocuments({ retailerId })
+        const totalPages = Math.ceil(countOrder / pageSize);
 
-        const orders = await order.find({ retailerId }).populate('salesExecId').populate('productionId')
+        const orders = await order.find({ retailerId })
+            .skip((page - 1) * pageSize)
+            .limit(Number(pageSize))
+            .populate('salesExecId')
+            .populate('productionId')
 
-        res.status(200).json({ success: true, orders, countOrder });
+        res.status(200).json({ success: true, orders, countOrder, totalPages });
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 
 export const addSubscription = async (req: Request, res: Response) => {
     const { planId, id } = req.query

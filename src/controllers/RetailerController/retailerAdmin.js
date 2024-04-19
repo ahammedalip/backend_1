@@ -89,14 +89,27 @@ const addSalesExecutive = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.addSalesExecutive = addSalesExecutive;
 const getSalesList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const id = req.query.id;
+    // try {
+    //     const validAdmin = await retailerAdmin.findById(id)
+    //     if (!validAdmin) {
+    //         return res.status(403).json({ success: false, message: "Please login" })
+    //     }
+    //     const salesExeclist = await retailerSales.find({ retailerAdminId: id })
+    //     res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist })
     const id = req.query.id;
+    const pageSize = 10;
     try {
+        const { page = 1 } = req.query;
         const validAdmin = yield RetailerAdmin_1.retailerAdmin.findById(id);
         if (!validAdmin) {
             return res.status(403).json({ success: false, message: "Please login" });
         }
-        const salesExeclist = yield RetailerSales_1.default.find({ retailerAdminId: id });
-        res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist });
+        const countSales = yield RetailerSales_1.default.countDocuments({ retailerAdminId: id });
+        const totalPages = Math.ceil(countSales / pageSize);
+        const salesExeclist = yield RetailerSales_1.default.find({ retailerAdminId: id })
+            .skip((page - 1) * pageSize).limit(Number(pageSize));
+        res.status(200).json({ success: true, message: 'list fetched successfully', salesExeclist, pageSize, totalPages });
     }
     catch (error) {
         console.log('error at sales exec list', error);
@@ -259,12 +272,30 @@ const sendConnectionRequest = (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 exports.sendConnectionRequest = sendConnectionRequest;
+// export const getOrder = async (req: Request, res: Response) => {
+//     const retailerId = req.query.id;
+//     try {
+//         const countOrder = await order.countDocuments({ retailerId })
+//         const orders = await order.find({ retailerId }).populate('salesExecId').populate('productionId')
+//         res.status(200).json({ success: true, orders, countOrder });
+//     } catch (error) {
+//         console.error('Error fetching orders:', error);
+//         res.status(500).json({ success: false, message: 'Internal server error' });
+//     }
+// };
 const getOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const retailerId = req.query.id;
+    const retailerId = req.id;
+    const pageSize = 6;
     try {
+        const { page = 1 } = req.query;
         const countOrder = yield Order_1.default.countDocuments({ retailerId });
-        const orders = yield Order_1.default.find({ retailerId }).populate('salesExecId').populate('productionId');
-        res.status(200).json({ success: true, orders, countOrder });
+        const totalPages = Math.ceil(countOrder / pageSize);
+        const orders = yield Order_1.default.find({ retailerId })
+            .skip((page - 1) * pageSize)
+            .limit(Number(pageSize))
+            .populate('salesExecId')
+            .populate('productionId');
+        res.status(200).json({ success: true, orders, countOrder, totalPages });
     }
     catch (error) {
         console.error('Error fetching orders:', error);
