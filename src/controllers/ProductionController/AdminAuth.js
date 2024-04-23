@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.otpVerification = exports.productionValidation = void 0;
+exports.login = exports.otpVerification = exports.resendOTP = exports.productionValidation = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const ProductionAdmin_1 = __importDefault(require("../../models/ProductionAdmin"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
@@ -75,6 +75,45 @@ const productionValidation = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.productionValidation = productionValidation;
+const resendOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('just coming here');
+    console.log('req.body', req.body.email);
+    try {
+        const generatedOTP = Math.floor(100000 + Math.random() * 900000);
+        const fetchUser = yield ProductionAdmin_1.default.findOneAndUpdate({ email: req.body.email }, { otpCode: generatedOTP }, { new: true });
+        console.log('Generated otp is ', generatedOTP);
+        const transporter = nodemailer_1.default.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'ahmd.work12@gmail.com',
+                pass: 'awbs lrfg gwgv zqvg'
+            }
+        });
+        const mailOptions = {
+            from: 'ahmd.work12@gmail.com',
+            to: req.body.email, // User's email
+            subject: 'OTP Verification',
+            text: `Your OTP for verification of Producton unit registration of Scale.b is  : ${generatedOTP}. 
+            Do not share the OTP with anyone.
+            For further details and complaints visit www.scale.b.online`
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                return res.status(400).json({ success: false, message: "Error at sending mail" });
+            }
+            else {
+                console.log('Email sent: ' + info.response);
+                return res.status(250).json({ success: true, message: 'OTP send succesfully' });
+            }
+        });
+    }
+    catch (error) {
+        console.log('error while resending otp', error);
+        res.status(500).json({ success: false, message: 'Error while resending otp' });
+    }
+});
+exports.resendOTP = resendOTP;
 const otpVerification = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { data, email } = req.body;
     const { otp } = data;

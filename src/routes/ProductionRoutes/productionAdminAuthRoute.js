@@ -8,5 +8,6 @@ const AdminAuth_1 = require("../../controllers/ProductionController/AdminAuth");
 const router = express_1.default.Router();
 router.post('/verify_cred', AdminAuth_1.productionValidation);
 router.post('/verify_otp', AdminAuth_1.otpVerification);
+router.post('/resend-otp', AdminAuth_1.resendOTP);
 router.post('/login', AdminAuth_1.login);
 exports.default = router;
