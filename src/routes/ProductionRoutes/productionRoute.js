@@ -29,4 +29,6 @@ router.get('/search-user', verifyUser_1.verifyProduction, ProductionController_1
 router.get('/retailer-sort', verifyUser_1.verifyProduction, ProductionController_1.sortRetailer);
 router.get('/report', verifyUser_1.verifyProduction, ProductionController_1.getReports);
 router.get('/fetch-plans', verifyUser_1.verifyProduction, superAdmin_1.fetchPlans);
+router.patch('/edit-acc', verifyUser_1.verifyProduction, ProductionController_1.acceptEditReq);
+router.patch('/edit-deny', verifyUser_1.verifyProduction, ProductionController_1.denyEditRequest);
 exports.default = router;

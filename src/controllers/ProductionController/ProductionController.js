@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchPlans = exports.getReports = exports.addSubscription = exports.sendConnectionRequest = exports.getRetailerProfile = exports.sortRetailer = exports.searchRetailer = exports.getAvailRetailList = exports.getConnRetailersList = exports.getSalesProfile = exports.availableSales = exports.rejectReq = exports.acceptReq = exports.fetchRequestedRetailers = exports.addItem = exports.getProfile = void 0;
+exports.denyEditRequest = exports.acceptEditReq = exports.fetchPlans = exports.getReports = exports.addSubscription = exports.sendConnectionRequest = exports.getRetailerProfile = exports.sortRetailer = exports.searchRetailer = exports.getAvailRetailList = exports.getConnRetailersList = exports.getSalesProfile = exports.availableSales = exports.rejectReq = exports.acceptReq = exports.fetchRequestedRetailers = exports.addItem = exports.getProfile = void 0;
 const ProductionAdmin_1 = __importDefault(require("../../models/ProductionAdmin"));
 const Order_1 = __importDefault(require("../../models/Order"));
 const RetailerSales_1 = __importDefault(require("../../models/RetailerSales"));
@@ -471,3 +471,41 @@ const fetchPlans = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.fetchPlans = fetchPlans;
+const acceptEditReq = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body);
+    try {
+        const updateReq = yield Order_1.default.findByIdAndUpdate(req.body.orderId, { $set: { updateRequest: 'Granted' } }, { new: true });
+        if (updateReq) {
+            console.log('Order updated successfully:', updateReq);
+        }
+        else {
+            console.log('Order not found', updateReq);
+            return res.status(404).json({ success: false });
+        }
+        res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.log('error while updating edit req', error);
+        res.status(500).json({ success: false, message: 'error while updating edit req' });
+    }
+});
+exports.acceptEditReq = acceptEditReq;
+const denyEditRequest = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('herere');
+    console.log(req.body.orderId);
+    try {
+        const updateOrder = yield Order_1.default.findByIdAndUpdate(req.body.orderId, { $set: { updateRequest: "Denied" } }, { new: true });
+        if (updateOrder) {
+            console.log('Order updated successfully:', updateOrder);
+        }
+        else {
+            console.log('Order not found', updateOrder);
+            return res.status(404).json({ success: false });
+        }
+        res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.log('Error while rejecting edit request', error);
+    }
+});
+exports.denyEditRequest = denyEditRequest;

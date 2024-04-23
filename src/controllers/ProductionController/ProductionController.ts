@@ -543,3 +543,45 @@ export const fetchPlans = async (req:Request, res:Response) =>{
         res.status(500)
     }
 }
+
+export const acceptEditReq = async (req: Request, res: Response) => {
+    console.log(req.body);
+    try {
+        const updateReq = await order.findByIdAndUpdate(
+            req.body.orderId,
+            { $set: { updateRequest: 'Granted' } },
+            { new: true })
+
+        if (updateReq) {
+            console.log('Order updated successfully:', updateReq);
+        } else {
+            console.log('Order not found', updateReq);
+            return res.status(404).json({success:false })
+        }
+        res.status(200).json({ success: true })
+    } catch (error) {
+        console.log('error while updating edit req', error);
+        res.status(500).json({ success: false, message: 'error while updating edit req' })
+    }
+}
+
+export const denyEditRequest = async(req:Request, res:Response)=>{
+    console.log('herere')
+    console.log(req.body.orderId)
+    try {
+        const updateOrder = await order.findByIdAndUpdate(
+            req.body.orderId,
+            {$set: {updateRequest: "Denied"}},
+            {new:true}
+        )
+        if (updateOrder) {
+            console.log('Order updated successfully:', updateOrder);
+        } else {
+            console.log('Order not found', updateOrder);
+            return res.status(404).json({success:false })
+        }
+        res.status(200).json({ success: true })
+    } catch (error) {
+        console.log('Error while rejecting edit request', error)
+    }
+}

@@ -286,20 +286,6 @@ export const sendConnectionRequest = async (req: CustomRequest, res: Response) =
 };
 
 
-// export const getOrder = async (req: Request, res: Response) => {
-//     const retailerId = req.query.id;
-//     try {
-//         const countOrder = await order.countDocuments({ retailerId })
-
-//         const orders = await order.find({ retailerId }).populate('salesExecId').populate('productionId')
-
-//         res.status(200).json({ success: true, orders, countOrder });
-//     } catch (error) {
-//         console.error('Error fetching orders:', error);
-//         res.status(500).json({ success: false, message: 'Internal server error' });
-//     }
-// };
-
 export const getOrder = async (req: CustomRequest, res: Response) => {
     const retailerId = req.id
     const pageSize: number = 6;
@@ -369,8 +355,8 @@ export const addSubscription = async (req: Request, res: Response) => {
     }
 }
 
-export const getReport = async (req: Request, res: Response) => {
-    let userId = req.query.id?.toString();
+export const getReport = async (req: CustomRequest, res: Response) => {
+    const userId = req.id
     try {
         const verifyRetailer = await retailerAdmin.findById(userId)
         if (!verifyRetailer) {

@@ -1,7 +1,8 @@
 import express from 'express'
 import { verifyProduction } from '../../utils/verifyUser';
 import {
-    acceptReq, addItem, addSubscription, availableSales, fetchRequestedRetailers,
+    acceptEditReq,
+    acceptReq, addItem, addSubscription, availableSales, denyEditRequest, fetchRequestedRetailers,
     getAvailRetailList, getConnRetailersList, getProfile, getReports, getRetailerProfile, getSalesProfile,
     rejectReq, searchRetailer, sendConnectionRequest,
     sortRetailer
@@ -35,5 +36,7 @@ router.get('/search-user', verifyProduction, searchRetailer)
 router.get('/retailer-sort', verifyProduction, sortRetailer)
 router.get('/report', verifyProduction,getReports)
 router.get('/fetch-plans', verifyProduction,fetchPlans)
+router.patch('/edit-acc', verifyProduction,acceptEditReq)
+router.patch('/edit-deny', verifyProduction,denyEditRequest)
 
 export default router;

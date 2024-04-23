@@ -153,9 +153,35 @@ const editOrderRequest = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.editOrderRequest = editOrderRequest;
 const editOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const id = req.id
+    // console.log('from req.body', req.body);
+    // try {
     const id = req.id;
     console.log('from req.body', req.body);
+    const { orderId, scheduledDate, quantity, description } = req.body;
     try {
+        const updateFields = {};
+        if (scheduledDate) {
+            updateFields.scheduledDate = scheduledDate;
+        }
+        if (quantity) {
+            updateFields.quantity = quantity;
+        }
+        if (description) {
+            updateFields.description = description;
+        }
+        updateFields.updateRequest = '';
+        const updatedOrder = yield Order_1.default.findByIdAndUpdate(orderId, {
+            $set: updateFields,
+        }, { new: true });
+        if (updatedOrder) {
+            console.log('Order updated successfully:', updatedOrder);
+            res.status(200).json({ success: true, updatedOrder });
+        }
+        else {
+            console.log('Order not found');
+            res.status(404).json({ success: false, message: 'Order not found' });
+        }
     }
     catch (error) {
         console.log('error while editing order', error);
