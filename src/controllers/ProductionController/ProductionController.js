@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.denyEditRequest = exports.acceptEditReq = exports.fetchPlans = exports.getReports = exports.addSubscription = exports.sendConnectionRequest = exports.getRetailerProfile = exports.sortRetailer = exports.searchRetailer = exports.getAvailRetailList = exports.getConnRetailersList = exports.getSalesProfile = exports.availableSales = exports.rejectReq = exports.acceptReq = exports.fetchRequestedRetailers = exports.addItem = exports.getProfile = void 0;
+exports.editDescription = exports.denyEditRequest = exports.acceptEditReq = exports.fetchPlans = exports.getReports = exports.addSubscription = exports.sendConnectionRequest = exports.getRetailerProfile = exports.sortRetailer = exports.searchRetailer = exports.getAvailRetailList = exports.getConnRetailersList = exports.getSalesProfile = exports.availableSales = exports.rejectReq = exports.acceptReq = exports.fetchRequestedRetailers = exports.addItem = exports.getProfile = void 0;
 const ProductionAdmin_1 = __importDefault(require("../../models/ProductionAdmin"));
 const Order_1 = __importDefault(require("../../models/Order"));
 const RetailerSales_1 = __importDefault(require("../../models/RetailerSales"));
@@ -506,6 +506,20 @@ const denyEditRequest = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
     catch (error) {
         console.log('Error while rejecting edit request', error);
+        res.status(500);
     }
 });
 exports.denyEditRequest = denyEditRequest;
+const editDescription = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const updateDescription = yield ProductionAdmin_1.default.findByIdAndUpdate({ _id: req.id }, {
+            description: req.body.description
+        });
+        res.status(200).json({ success: true, message: 'description updated successfully' });
+    }
+    catch (error) {
+        console.log('Error while updating subscription', error);
+        res.status(500);
+    }
+});
+exports.editDescription = editDescription;

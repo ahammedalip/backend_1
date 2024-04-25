@@ -31,4 +31,5 @@ router.get('/report', verifyUser_1.verifyProduction, ProductionController_1.getR
 router.get('/fetch-plans', verifyUser_1.verifyProduction, superAdmin_1.fetchPlans);
 router.patch('/edit-acc', verifyUser_1.verifyProduction, ProductionController_1.acceptEditReq);
 router.patch('/edit-deny', verifyUser_1.verifyProduction, ProductionController_1.denyEditRequest);
+router.post('/update-desc', verifyUser_1.verifyProduction, ProductionController_1.editDescription);
 exports.default = router;
