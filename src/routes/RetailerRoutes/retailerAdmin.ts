@@ -1,5 +1,5 @@
 import  express from "express";
-import {  addSalesExecutive, addSubscription, avialableProd, blockSalesExec, connectedProd, fetchRetailPlans, getOrder, getReport, getSalesList, profile, sendConnectionRequest, showProductionprofile } from "../../controllers/RetailerController/retailerAdmin";
+import {  addSalesExecutive, addSubscription, avialableProd, blockSalesExec, connectedProd, editDescription, fetchRetailPlans, getOrder, getReport, getSalesList, profile, sendConnectionRequest, showProductionprofile } from "../../controllers/RetailerController/retailerAdmin";
 import { verifyRetailer } from "../../utils/verifyUser";
 
 
@@ -19,6 +19,7 @@ router.get('/getOrder', verifyRetailer,getOrder)
 router.patch('/subscription', verifyRetailer, addSubscription)
 router.get('/reports', verifyRetailer, getReport)
 router.get('/fetch-plans', verifyRetailer,fetchRetailPlans)
+router.post('/update-desc', verifyRetailer,editDescription )
 
 
 export default router;

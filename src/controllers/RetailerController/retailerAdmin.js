@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchRetailPlans = exports.getReport = exports.addSubscription = exports.getOrder = exports.sendConnectionRequest = exports.showProductionprofile = exports.avialableProd = exports.connectedProd = exports.profile = exports.blockSalesExec = exports.getSalesList = exports.addSalesExecutive = void 0;
+exports.editDescription = exports.fetchRetailPlans = exports.getReport = exports.addSubscription = exports.getOrder = exports.sendConnectionRequest = exports.showProductionprofile = exports.avialableProd = exports.connectedProd = exports.profile = exports.blockSalesExec = exports.getSalesList = exports.addSalesExecutive = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
@@ -380,3 +380,14 @@ const fetchRetailPlans = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.fetchRetailPlans = fetchRetailPlans;
+const editDescription = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const updateDescription = yield RetailerAdmin_1.retailerAdmin.findByIdAndUpdate({ _id: req.id }, { description: req.body.description });
+        res.status(200).json({ success: true, message: 'Description is updated successfully' });
+    }
+    catch (error) {
+        console.log('error while updating description');
+        res.status(500);
+    }
+});
+exports.editDescription = editDescription;

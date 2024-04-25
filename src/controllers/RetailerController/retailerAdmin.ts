@@ -417,3 +417,16 @@ export const fetchRetailPlans = async (req: Request, res: Response) => {
         res.status(500)
     }
 }
+
+export const editDescription = async(req:CustomRequest, res:Response)=>{
+    try {
+        const updateDescription = await retailerAdmin.findByIdAndUpdate(
+            {_id:req.id},
+            {description:req.body.description}
+        )
+        res.status(200).json({success:true, message: 'Description is updated successfully'})
+    } catch (error) {
+        console.log('error while updating description');
+        res.status(500)
+    }
+}
