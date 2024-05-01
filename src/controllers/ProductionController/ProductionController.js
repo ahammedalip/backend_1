@@ -206,6 +206,20 @@ const getConnRetailersList = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 return 0;
             });
         }
+        else {
+            connected = connected === null || connected === void 0 ? void 0 : connected.sort((a, b) => {
+                var _a, _b;
+                const nameA = (_a = a.retailerName) === null || _a === void 0 ? void 0 : _a.toUpperCase();
+                const nameB = (_b = b.retailerName) === null || _b === void 0 ? void 0 : _b.toUpperCase();
+                if (nameA < nameB) {
+                    return 1;
+                }
+                if (nameA > nameB) {
+                    return -1;
+                }
+                return 0;
+            });
+        }
         console.log(connected);
         res.status(200).json({ success: true, message: 'fetched successfully', connected });
     }

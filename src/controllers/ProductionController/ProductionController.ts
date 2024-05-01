@@ -255,7 +255,21 @@ export const getConnRetailersList = async (req: CustomRequest, res: Response) =>
                 }
                 return 0;
             });
+        }else{
+            connected = connected?.sort((a: any, b: any) => {
+                const nameA = a.retailerName?.toUpperCase();
+                const nameB = b.retailerName?.toUpperCase();
+                if (nameA < nameB) {
+                    return 1;
+                }
+                if (nameA > nameB) {
+                    return -1;
+                }
+                return 0;
+            });
         }
+
+        
         console.log(connected);
         res.status(200).json({ success: true, message: 'fetched successfully', connected });
 
